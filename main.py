@@ -1,5 +1,8 @@
 
 from visualize import create_visualization
+from crop import get_random_crops, get_bars_color
+
+from PIL import Image
 
 import subprocess
 import os
@@ -34,27 +37,34 @@ def extract_snippets(audio_file, start_times, duration=10):
 
 input_filename = "bjork.wav"
 snippets_begin = [30, 60, 120]
+
+# audio snippets
 extract_snippets(input_filename, snippets_begin)
 
+# album cover snippets (shuffled so each snippet gets a random cover)
+source_img = Image.open("cover.png").convert("RGB")
+crops     = get_random_crops(source_img)
+bar_color = get_bars_color(source_img)
+
 filename, ext = os.path.splitext(input_filename)
-
 for i in range(1, len(snippets_begin) + 1):
-    snippet_input = SNIPPET_FILE_FORMAT.format(base=filename, i=i)
-    snippet_filepath = os.path.join(OUTPUT_DIR, snippet_input)
-    visualization_output = VISUALIZATION_FILE_FORMAT.format(base=filename, i=i)
-    visualization_path = os.path.join(OUTPUT_DIR, visualization_output)
-    create_visualization(snippet_filepath, visualization_path)
+    snippet_filepath = os.path.join(OUTPUT_DIR, SNIPPET_FILE_FORMAT.format(base=filename, i=i))
+    visualization_output = os.path.join(OUTPUT_DIR, VISUALIZATION_FILE_FORMAT.format(base=filename, i=i))
 
-    output = OUTPUT_FILE_FORMAT.format(base=filename, i=i)
-    output_path = os.path.join(OUTPUT_DIR, output)
+    create_visualization(snippet_filepath, crops[i], bar_color, visualization_output)
+
+    output = os.path.join(OUTPUT_DIR, OUTPUT_FILE_FORMAT.format(base=filename, i=i))
     # stich audio and video together
-    #  ffmpeg -y -i output.mp4 -i bjork.wav -c:v copy -c:a aac -strict experimental final_with_audio.mp4
+    # should construct a command such as:
+    #   ffmpeg -y -i output.mp4 -i bjork.wav -c:v copy -c:a aac -strict experimental final_with_audio.mp4
+
+    print(f"Writing final output to {snippet_filepath}")
     cmd = [
         "ffmpeg",
         "-v", "error",  # only shows erros for a cleaner output
         "-y",  # answers yes if file already exists
 
-        "-i", visualization_path,
+        "-i", visualization_output,
         "-i", snippet_filepath,
 
         "-c:v", "copy",
@@ -62,7 +72,7 @@ for i in range(1, len(snippets_begin) + 1):
 
         "-strict", "experimental",
 
-        output_path
+        output
     ]
     subprocess.run(cmd, check=True)
 
