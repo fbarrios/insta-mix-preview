@@ -1,87 +1,69 @@
-from AudioAnalyzer import AudioAnalyzer
 
-import numpy as np
-import pygame
-import cv2
+from visualize import create_visualization
 
-FPS = 30
-FRAME_DURATION = 1 / FPS
-FRAGMENT_DURATION_S = 10
+import subprocess
+import os
 
-NUMBER_OF_BARS = 50
-SCREEN_WIDTH = 1080
-SCREEN_HEIGHT = 1350
+OUTPUT_DIR = "output"
 
-BAR_COLOR = (0, 0, 0)
-BACKGROUND_COLOR = (255, 255, 255)
+SNIPPET_FILE_FORMAT = "{base}-snippet-{i}.wav"
+VISUALIZATION_FILE_FORMAT = "{base}-snippet-{i}-visualization.mp4"
+OUTPUT_FILE_FORMAT = "{base}-snippet-{i}.mp4"
 
-BAR_AREA_TOP = SCREEN_HEIGHT * 2 // 3  # start of bottom third
-BAR_AREA_BOTTOM = SCREEN_HEIGHT
-BAR_AREA_HEIGHT = BAR_AREA_BOTTOM - BAR_AREA_TOP
+def extract_snippets(audio_file, start_times, duration=10):
+    filename, ext = os.path.splitext(audio_file)
+    for i, start in enumerate(start_times, 1):
+        output_filename = SNIPPET_FILE_FORMAT.format(base=filename, i=i)
+        output_path = os.path.join(OUTPUT_DIR, output_filename)
 
+        if os.path.exists(output_path):
+            print(f"{output_path} already exists, skipping...")
+            continue
 
-def draw_visualizer_frame(screen, analyzer, time_sec):
-    screen.fill(BACKGROUND_COLOR)
-
-    fft = analyzer.fft(time_sec)
-    band_size = len(fft) // NUMBER_OF_BARS
-    bar_width = SCREEN_WIDTH // (NUMBER_OF_BARS + 1)
-
-    for i in range(NUMBER_OF_BARS):
-        start = i * band_size
-        end = start + band_size
-        amplitude = np.mean(fft[start:end])
-
-        # Normalize amplitude
-        amplitude = np.clip(amplitude, -80, 0)  # dBFS
-        norm = (amplitude + 80) / 80  # 0.0 to 1.0
-
-        # Scale to visual height
-        bar_height = int(norm * BAR_AREA_HEIGHT)
-
-        x = (i + 1) * bar_width
-        y = BAR_AREA_BOTTOM - bar_height
-
-        pygame.draw.rect(screen, BAR_COLOR, (x, y, bar_width // 2, bar_height))
+        cmd = [
+            "ffmpeg",
+            "-v", "error",  # only shows erros for a cleaner output
+            "-ss", str(start),
+            "-t", str(duration),
+            "-i", audio_file,
+            "-c", "copy",  # avoid re-encoding
+            output_path
+        ]
+        subprocess.run(cmd, check=True)
 
 
-def create_visualization(filename):
-    analyzer = AudioAnalyzer()
-    analyzer.load(filename)
+input_filename = "bjork.wav"
+snippets_begin = [30, 60, 120]
+extract_snippets(input_filename, snippets_begin)
 
-    pygame.mixer.quit()
-    pygame.init()
+filename, ext = os.path.splitext(input_filename)
 
-    screen = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+for i in range(1, len(snippets_begin) + 1):
+    snippet_input = SNIPPET_FILE_FORMAT.format(base=filename, i=i)
+    snippet_filepath = os.path.join(OUTPUT_DIR, snippet_input)
+    visualization_output = VISUALIZATION_FILE_FORMAT.format(base=filename, i=i)
+    visualization_path = os.path.join(OUTPUT_DIR, visualization_output)
+    create_visualization(snippet_filepath, visualization_path)
 
-    running = True
+    output = OUTPUT_FILE_FORMAT.format(base=filename, i=i)
+    output_path = os.path.join(OUTPUT_DIR, output)
+    # stich audio and video together
+    #  ffmpeg -y -i output.mp4 -i bjork.wav -c:v copy -c:a aac -strict experimental final_with_audio.mp4
+    cmd = [
+        "ffmpeg",
+        "-v", "error",  # only shows erros for a cleaner output
+        "-y",  # answers yes if file already exists
 
-    # Setup OpenCV writer
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    writer = cv2.VideoWriter(f"{filename}-visualization.mp4", fourcc, FPS, (SCREEN_WIDTH, SCREEN_HEIGHT))
-    
-    frame_count = 0
-    max_frames = int(FRAGMENT_DURATION_S * FPS)
+        "-i", visualization_path,
+        "-i", snippet_filepath,
 
-    while running and frame_count < max_frames:
-        time_sec = frame_count * FRAME_DURATION
-        
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
+        "-c:v", "copy",
+        "-c:a", "aac",
 
-        draw_visualizer_frame(screen, analyzer, time_sec)
+        "-strict", "experimental",
 
-        frame = pygame.surfarray.array3d(screen).swapaxes(0, 1)
-        frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-        writer.write(frame_bgr)
+        output_path
+    ]
+    subprocess.run(cmd, check=True)
 
-        print(f"\rProcessing: {100 * frame_count // max_frames}%", end="", flush=True)
-        frame_count += 1
 
-    writer.release()
-    pygame.quit()
-
-    print("\nDone.")
-
-create_visualization('bjork.wav')

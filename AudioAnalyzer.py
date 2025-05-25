@@ -13,7 +13,7 @@ def bin_search(arr, target):
 
     if target < arr[0]:
         return 0
-    
+
     if target > arr[len(arr) - 1]:
         return len(arr) - 1
 
