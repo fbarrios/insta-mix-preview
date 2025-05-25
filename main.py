@@ -7,9 +7,6 @@ import pygame
 import cv2
 import math
 
-def rnd_color():
-    h, s, l = random.random(), 0.5 + random.random() / 2.0, 0.4 + random.random() / 5.0
-    return [int(256 * i) for i in colorsys.hls_to_rgb(h, l, s)]
 
 filename = "bjork.wav"
 
@@ -63,6 +60,47 @@ bars = []
 tmp_bars = []
 length = 0
 
+NUMBER_OF_BARS = 50
+SCREEN_WIDTH = 1080
+SCREEN_HEIGHT = 1350
+
+BAR_COLOR = (0, 0, 0)
+BACKGROUND_COLOR = (255, 255, 255)
+
+BAR_AREA_TOP = SCREEN_HEIGHT * 2 // 3  # start of bottom third
+BAR_AREA_BOTTOM = SCREEN_HEIGHT
+BAR_AREA_HEIGHT = BAR_AREA_BOTTOM - BAR_AREA_TOP
+
+
+def draw_visualizer_frame(screen, analyzer, time_sec):
+    screen.fill(BACKGROUND_COLOR)
+
+    fft = analyzer.fft(time_sec)
+    band_size = len(fft) // NUMBER_OF_BARS
+    bar_width = SCREEN_WIDTH // (NUMBER_OF_BARS + 1)
+
+    for i in range(NUMBER_OF_BARS):
+        start = i * band_size
+        end = start + band_size
+        amplitude = np.mean(fft[start:end])
+
+        # Normalize amplitude
+        amplitude = np.clip(amplitude, -80, 0)  # dBFS
+        norm = (amplitude + 80) / 80  # 0.0 to 1.0
+
+        # Scale to visual height
+        bar_height = int(norm * BAR_AREA_HEIGHT)
+
+        x = (i + 1) * bar_width
+        y = BAR_AREA_BOTTOM - bar_height
+
+        pygame.draw.rect(screen, BAR_COLOR, (x, y, bar_width // 2, bar_height))
+
+
+def rnd_color():
+    h, s, l = random.random(), 0.5 + random.random() / 2.0, 0.4 + random.random() / 5.0
+    return [int(256 * i) for i in colorsys.hls_to_rgb(h, l, s)]
+
 for group in freq_groups:
     g = []
     s = group["stop"] - group["start"]
@@ -100,13 +138,9 @@ for g in tmp_bars:
         ang += angle_dt
     bars.append(gr)
 
-# REMOVE this line — it didn't work:
-# pygame.mixer.music.load(filename)
-# INSTEAD, use analyzer.time directly if needed
 
 # Frame capture list
 screen = pygame.Surface((screen_w, screen_h))  # headless surface
-
 
 running = True
 duration_sec = 30
@@ -121,7 +155,8 @@ writer = cv2.VideoWriter("output.mp4", fourcc, fps, (screen_w, screen_h))
 
 frame_duration = 1 / fps
 frame_count = 0
-max_frames = int(60 * fps)
+total_dur_secs = 10
+max_frames = int(total_dur_secs * fps)
 
 
 
@@ -186,8 +221,10 @@ while running and frame_count < max_frames:
             poly.append(b.rect.points[2])
 
     draw_color = tuple(max(0, min(255, int(c))) for c in poly_color)
-    pygame.draw.polygon(screen, poly_color, poly)
-    pygame.draw.circle(screen, circle_color, (circleX, circleY), int(radius))
+    # pygame.draw.polygon(screen, poly_color, poly)
+    # pygame.draw.circle(screen, circle_color, (circleX, circleY), int(radius))
+
+    draw_visualizer_frame(screen, analyzer, time_sec)
 
     frame = pygame.surfarray.array3d(screen).swapaxes(0, 1)
     frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)

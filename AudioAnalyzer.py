@@ -87,8 +87,15 @@ class AudioAnalyzer:
 
         self.frequencies_index_ratio = len(frequencies)/frequencies[len(frequencies)-1]
 
+    def fft(self, time_sec):
+        """
+        Returns a 1D array of decibel values for all frequencies at the given time (in seconds).
+        Useful for visualizers.
+        """
+        time_index = int(time_sec * self.time_index_ratio)
+        time_index = min(max(time_index, 0), self.spectrogram.shape[1] - 1)
 
-
+        return self.spectrogram[:, time_index]
 
     def show(self):
 
