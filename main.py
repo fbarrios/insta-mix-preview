@@ -44,7 +44,8 @@ extract_snippets(input_filename, snippets_begin)
 # album cover snippets (shuffled so each snippet gets a random cover)
 source_img = Image.open("cover.png").convert("RGB")
 crops     = get_random_crops(source_img)
-bar_color = get_bars_color(source_img)
+## bar_color = get_bars_color(source_img) this not used for now, will hardcode it white
+bar_color = (247, 247, 248)
 
 filename, ext = os.path.splitext(input_filename)
 for i in range(1, len(snippets_begin) + 1):
