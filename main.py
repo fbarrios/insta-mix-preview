@@ -1,4 +1,4 @@
-from AudioAnalyzer import *
+from AudioAnalyzer import AudioAnalyzer
 
 import numpy as np
 import pygame
@@ -64,12 +64,8 @@ def create_visualization(filename):
     max_frames = int(FRAGMENT_DURATION_S * FPS)
 
     while running and frame_count < max_frames:
-        t = pygame.time.get_ticks()
-
         time_sec = frame_count * FRAME_DURATION
         
-        # screen.fill(circle_color)
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -87,3 +83,5 @@ def create_visualization(filename):
     pygame.quit()
 
     print("\nDone.")
+
+create_visualization('bjork.wav')
