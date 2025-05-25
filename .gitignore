@@ -2,6 +2,8 @@
 *.mp3
 *.mp4
 
+.python-version
+
 __pycache__/
 venv/
 
