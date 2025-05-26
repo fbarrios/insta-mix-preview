@@ -1,8 +1,5 @@
-
-import matplotlib.pyplot as plt
-import librosa.display
+import librosa
 import numpy as np
-
 
 
 def bin_search(arr, target):

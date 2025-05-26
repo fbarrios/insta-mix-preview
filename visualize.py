@@ -1,11 +1,14 @@
 from AudioAnalyzer import AudioAnalyzer
 
 import numpy as np
-import pygame
-import cv2
 
+import logging
 import os
 os.environ["SDL_AUDIODRIVER"] = "dummy"
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "true"
+
+import pygame
+import cv2
 
 
 FPS = 30
@@ -86,11 +89,13 @@ def create_visualization(input_filename, background_img, bar_color, output_filen
         frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
         writer.write(frame_bgr)
 
-        print(f"\rProcessing visualization for {output_filename}: {100 * frame_count // max_frames}% ", end="", flush=True)
+        if frame_count % (max_frames // 10) == 0:
+            logging.info(f"Processing visualization for {output_filename}: {100 * frame_count // max_frames}%")
+
         frame_count += 1
 
     writer.release()
     pygame.quit()
 
-    print("Done.")
+    logging.info("Done.")
 

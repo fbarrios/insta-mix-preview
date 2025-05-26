@@ -16,9 +16,44 @@ It will generate up to 5 videos playing the samples in the background and a
 visualization of the music with stacked bars. Videos will be in 1080x1080 which is
 Instagram's suggested resolution (source: https://help.instagram.com/1631821640426723).
 
-Random squares of the album cover passed will be used as a background.
+Random squares of the album cover passed will be used as a background. Output is in
+the output directory.
 
-Output is in the output directory.
+
+Based originally on the project: https://gitlab.com/avirzayev/music-visualizer by
+[Avi Rzayev](https://gitlab.com/avirzayev).
+
+Sample song is [Coffee](https://freesound.org/people/tukyo.eth/sounds/608355/) by
+tukyo.eth.
+
+Sample cover is [white ceramic mug on brown wooden table](https://unsplash.com/photos/white-ceramic-mug-on-brown-wooden-table-S8daAB_nJSg)by Pariwat Pannium.
+
+## Installation
+
+1. Check which Python version you are running, this has been tested with 3.11.12
+
+```
+python --version
+```
+
+2. Create a new virtual environment and activate it
+
+```
+python3 -m venv venv
+source venv/bin/activate
+```
+
+3. Install package requirements
+
+```
+pip install -r requirements.txt
+```
+
+4. Example test run:
+
+```
+python insta-mix-preview.py --cover="coffee.png" --audio="coffee.wav" --snippets_start=2,13,24
+```
 
 ## Usage:
 
