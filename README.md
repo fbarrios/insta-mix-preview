@@ -1,11 +1,3 @@
-TODO:
-- push to github and make it available
-- make logging better
-    - stop showing pygame stuff
-    - info by default all except errors or debug mode
-- getopt
-- instrucciones de instalación
-
 # insta-mix-preview
 
 This script receives as parameters the file paths of the mix cover (1600x1600
