@@ -7,7 +7,9 @@ from sklearn.cluster import KMeans
 
 def get_random_crops(img, crop_size=720):
     assert img.size == (1600, 1600), "Image must be 1600x1600"
-
+    #return [(1600,1600),(1600,1600),(1600,1600),(1600,1600)]
+    crop_resized = img.resize((1080, 1080), resample=Image.LANCZOS)
+    return [crop_resized, crop_resized, crop_resized, crop_resized]
     region_centers = {
         "top_left": (400, 400),
         "top_right": (1200, 400),
