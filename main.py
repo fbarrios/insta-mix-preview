@@ -38,12 +38,10 @@ def _extract_snippets(audio_file, start_times, duration=10):
 
 def create_preview(audio_filename, img_filename, snippets_begin):
     # audio snippets
-    #_extract_snippets(audio_filename, snippets_begin)
+    _extract_snippets(audio_filename, snippets_begin)
 
     # album cover snippets (shuffled so each snippet gets a random cover)
-    source_img = Image.open(img_filename).convert("RGB")
-    source_img.resize((1600, 900), resample=Image.LANCZOS)
-    #crops     = get_random_crops(source_img)
+    crops     = get_random_crops(source_img)
     ## bar_color = get_bars_color(source_img) this not used for now, will hardcode it white
     bar_color = (247, 247, 248)
 
@@ -51,8 +49,7 @@ def create_preview(audio_filename, img_filename, snippets_begin):
     visualization_output = os.path.join(OUTPUT_DIR, VISUALIZATION_FILE_FORMAT.format(base=filename, i=0))
 
     create_visualization(audio_filename, source_img, bar_color, visualization_output)
-    return
-
+    
     filename, ext = os.path.splitext(audio_filename)    
     for i in range(1, len(snippets_begin) + 1):
         snippet_filepath = os.path.join(OUTPUT_DIR, SNIPPET_FILE_FORMAT.format(base=filename, i=i))
