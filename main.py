@@ -51,7 +51,7 @@ def create_preview(audio_filename, img_filename, snippets_begin):
         snippet_filepath = os.path.join(OUTPUT_DIR, SNIPPET_FILE_FORMAT.format(base=filename, i=i))
         visualization_output = os.path.join(OUTPUT_DIR, VISUALIZATION_FILE_FORMAT.format(base=filename, i=i))
 
-        create_visualization(snippet_filepath, crops[i], bar_color, visualization_output)
+        create_visualization(snippet_filepath, crops[i-1], bar_color, visualization_output)
 
         output = os.path.join(OUTPUT_DIR, OUTPUT_FILE_FORMAT.format(base=filename, i=i))
         # stich audio and video together
