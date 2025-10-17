@@ -47,11 +47,6 @@ def create_preview(audio_filename, img_filename, snippets_begin):
     bar_color = (247, 247, 248)
 
     filename, ext = os.path.splitext(audio_filename)    
-    visualization_output = os.path.join(OUTPUT_DIR, VISUALIZATION_FILE_FORMAT.format(base=filename, i=0))
-
-    create_visualization(audio_filename, source_img, bar_color, visualization_output)
-    
-    filename, ext = os.path.splitext(audio_filename)    
     for i in range(1, len(snippets_begin) + 1):
         snippet_filepath = os.path.join(OUTPUT_DIR, SNIPPET_FILE_FORMAT.format(base=filename, i=i))
         visualization_output = os.path.join(OUTPUT_DIR, VISUALIZATION_FILE_FORMAT.format(base=filename, i=i))
