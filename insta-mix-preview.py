@@ -2,7 +2,7 @@ import argparse
 import logging
 logging.basicConfig()
 
-from main import create_preview
+from main import generate_snippets
 
 
 def parse_args():
@@ -51,7 +51,7 @@ def main():
     logging.debug(f"[DEBUG] Audio path: {audio_path}")
     logging.debug(f"[DEBUG] Snippet start times: {snippets}")
 
-    create_preview(audio_path, cover_path, snippets)
+    generate_snippets(audio_path, cover_path, snippets)
 
 if __name__ == '__main__':
     main()

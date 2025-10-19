@@ -1,3 +1,5 @@
+# This module handles the creation of the visualization.
+
 from AudioAnalyzer import AudioAnalyzer
 
 import numpy as np
@@ -10,27 +12,24 @@ os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "true"
 import pygame
 import cv2
 
+from constants import OUTPUT_WIDTH, OUTPUT_HEIGHT, NUMBER_OF_BARS, BAR_COLOR, FRAGMENT_DURATION_S
+
 
 FPS = 30
 FRAME_DURATION = 1 / FPS
-FRAGMENT_DURATION_S = 10
-
-NUMBER_OF_BARS = 50
-SCREEN_WIDTH = 1080
-SCREEN_HEIGHT = 1080
 
 MARGIN_RATIO = 0.05
-MARGIN_PX = int(SCREEN_HEIGHT * MARGIN_RATIO)
+MARGIN_PX = int(OUTPUT_HEIGHT * MARGIN_RATIO)
 
-BAR_AREA_TOP = SCREEN_HEIGHT * 2 // 3 + MARGIN_PX
-BAR_AREA_BOTTOM = SCREEN_HEIGHT - MARGIN_PX
+BAR_AREA_TOP = OUTPUT_HEIGHT * 2 // 3 + MARGIN_PX
+BAR_AREA_BOTTOM = OUTPUT_HEIGHT - MARGIN_PX
 BAR_AREA_HEIGHT = BAR_AREA_BOTTOM - BAR_AREA_TOP
 
 
-def draw_visualizer_frame(screen, analyzer, bar_color, time_sec):
+def draw_visualizer_frame(screen, analyzer, time_sec):
     fft = analyzer.fft(time_sec)
     band_size = len(fft) // NUMBER_OF_BARS
-    bar_width = SCREEN_WIDTH // (NUMBER_OF_BARS + 1)
+    bar_width = OUTPUT_WIDTH // (NUMBER_OF_BARS + 1)
 
     for i in range(NUMBER_OF_BARS):
         start = i * band_size
@@ -47,7 +46,7 @@ def draw_visualizer_frame(screen, analyzer, bar_color, time_sec):
         x = (i + 1) * bar_width
         y = BAR_AREA_BOTTOM - bar_height
 
-        pygame.draw.rect(screen, bar_color, (x, y, bar_width // 2, bar_height))
+        pygame.draw.rect(screen, BAR_COLOR, (x, y, bar_width // 2, bar_height))
 
 
 def background_pil_to_pygame(pil_img):
@@ -57,7 +56,7 @@ def background_pil_to_pygame(pil_img):
     return surface
 
 
-def create_visualization(input_filename, background_img, bar_color, output_filename):
+def create_visualization(input_filename, background_img, output_filename):
     analyzer = AudioAnalyzer()
     analyzer.load(input_filename)
 
@@ -65,11 +64,11 @@ def create_visualization(input_filename, background_img, bar_color, output_filen
     pygame.init()
 
     bg_surface = background_pil_to_pygame(background_img)
-    screen = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+    screen = pygame.Surface((OUTPUT_WIDTH, OUTPUT_HEIGHT))
 
     # Setup OpenCV writer
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    writer = cv2.VideoWriter(output_filename, fourcc, FPS, (SCREEN_WIDTH, SCREEN_HEIGHT))
+    writer = cv2.VideoWriter(output_filename, fourcc, FPS, (OUTPUT_WIDTH, OUTPUT_HEIGHT))
 
     frame_count = 0
     max_frames = int(FRAGMENT_DURATION_S * FPS)
@@ -83,7 +82,7 @@ def create_visualization(input_filename, background_img, bar_color, output_filen
                 running = False
 
         screen.blit(bg_surface, (0, 0))
-        draw_visualizer_frame(screen, analyzer, bar_color, time_sec)
+        draw_visualizer_frame(screen, analyzer, time_sec)
 
         frame = pygame.surfarray.array3d(screen).swapaxes(0, 1)
         frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)

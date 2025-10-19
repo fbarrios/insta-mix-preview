@@ -8,9 +8,7 @@ It will generate up to 5 videos playing the samples in the background and a
 visualization of the music with stacked bars. Videos will be in 1080x1080 which is
 Instagram's suggested resolution (source: https://help.instagram.com/1631821640426723).
 
-Random squares of the album cover passed will be used as a background. Output is in
-the output directory.
-
+Output is in the "output" directory unless an absolute path is passed.
 
 Based originally on the project: https://gitlab.com/avirzayev/music-visualizer by
 [Avi Rzayev](https://gitlab.com/avirzayev).
@@ -21,6 +19,8 @@ tukyo.eth.
 Sample cover is [white ceramic mug on brown wooden table](https://unsplash.com/photos/white-ceramic-mug-on-brown-wooden-table-S8daAB_nJSg)by Pariwat Pannium.
 
 ## Installation
+
+0. This requires ffmpeg installed (usually enough with `brew install ffmpeg`)
 
 1. Check which Python version you are running, this has been tested with 3.11.12
 
