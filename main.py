@@ -56,7 +56,12 @@ def generate_snippets(audio_filename, img_filename, snippets_begin):
         logging.info(f"Writing final output to {output}")
         # stich audio and video together
         # should construct a command such as:
-        #   ffmpeg -y -i output.mp4 -i bjork.wav -c:v copy -c:a aac -strict experimental final_with_audio.mp4
+        # ffmpeg -y \
+        #     -i 251115_0185-snippet-2.mp4 \
+        #     -c:v libx264 -profile:v high -level 4.1 -pix_fmt yuv420p \
+        #     -movflags +faststart \
+        #     -c:a aac -b:a 192k \
+        #     fixed_251115_0185-snippet-2.mp4
         cmd = [
             "ffmpeg",
             "-v", "error",  # only shows erros for a cleaner output
@@ -65,8 +70,12 @@ def generate_snippets(audio_filename, img_filename, snippets_begin):
             "-i", visualization_output,
             "-i", snippet_filepath,
 
-            "-c:v", "copy",
+            "-c:v", "libx264",
+            "-profile:v", "high",
+            "-level", "4.1",
+            "-pix_fmt", "yuv420p",
             "-c:a", "aac",
+            "-b:a", "192k",
 
             "-strict", "experimental",
 
