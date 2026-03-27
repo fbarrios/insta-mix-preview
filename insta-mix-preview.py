@@ -5,6 +5,32 @@ logging.basicConfig()
 from main import generate_snippets
 
 
+def _to_wsl_path(path: str) -> str:
+    """
+    Convert Windows-style C: paths to their WSL equivalent.
+    Keeps other paths unchanged so Linux paths keep working.
+    """
+    if path and path[1:2] == ':' and path[0].lower() == 'c':
+        # strip the drive portion and normalize separators
+        remainder = path.split(':', 1)[1].lstrip("\\/")  # remove leading slashes from remainder
+        return "/mnt/c/" + remainder.replace("\\", "/")
+    return path
+
+
+def _parse_timestamp(ts: str) -> float:
+    """Allow timestamps in seconds or mm:ss."""
+    ts = ts.strip()
+    if not ts:
+        raise ValueError("empty timestamp")
+    if ':' in ts:
+        parts = ts.split(':')
+        if len(parts) == 2:
+            minutes, seconds = parts
+            return float(minutes) * 60 + float(seconds)
+        raise ValueError(f"unsupported timestamp format: {ts}")
+    return float(ts)
+
+
 def parse_args():
     parser = argparse.ArgumentParser(
         description="Generate a square Instagram preview by overlaying 10s audio snippets over a background cover."
@@ -25,7 +51,13 @@ def parse_args():
         '--snippets_start',
         type=str,
         default='',
-        help='Comma-separated list of up to 5 timestamps in seconds for snippet start points'
+        help='Comma-separated list of up to 5 timestamps in seconds or mm:ss for snippet start points'
+    )
+    parser.add_argument(
+        '--output',
+        type=str,
+        default='',
+        help='Output directory (defaults to the built-in output folder)'
     )
     parser.add_argument(
         '--debug',
@@ -43,15 +75,26 @@ def main():
     else:
         logging.getLogger().setLevel(logging.INFO)
 
-    cover_path = args.cover
-    audio_path = args.audio
-    snippets = [float(ts) for ts in args.snippets_start.split(',') if ts.strip()] if args.snippets_start else []
+    cover_path = _to_wsl_path(args.cover)
+    audio_path = _to_wsl_path(args.audio)
+    output_dir = _to_wsl_path(args.output) if args.output else None
+    if cover_path != args.cover or audio_path != args.audio or (args.output and output_dir != args.output):
+        logging.debug(f"[DEBUG] Converted Windows-style paths -> cover: {cover_path}, audio: {audio_path}, output: {output_dir or '[default]'}")
+    snippets = []
+    if args.snippets_start:
+        raw_snippets = [ts for ts in args.snippets_start.split(',') if ts.strip()]
+        try:
+            snippets = [_parse_timestamp(ts) for ts in raw_snippets]
+        except ValueError as exc:
+            logging.error(f"Invalid --snippets_start value: {exc}")
+            raise SystemExit(2)
 
     logging.debug(f"[DEBUG] Cover path: {cover_path}")
     logging.debug(f"[DEBUG] Audio path: {audio_path}")
+    logging.debug(f"[DEBUG] Output dir: {output_dir or '[default]'}")
     logging.debug(f"[DEBUG] Snippet start times: {snippets}")
 
-    generate_snippets(audio_path, cover_path, snippets)
+    generate_snippets(audio_path, cover_path, snippets, output_dir)
 
 if __name__ == '__main__':
     main()

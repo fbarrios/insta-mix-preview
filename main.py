@@ -12,11 +12,11 @@ VISUALIZATION_FILE_FORMAT = "{base}-snippet-{i}-visualization.mp4"
 OUTPUT_FILE_FORMAT        = "{base}-snippet-{i}.mp4"
 
 
-def _extract_snippets(audio_file, start_times, duration):
+def _extract_snippets(audio_file, start_times, duration, output_dir):
     filename, ext = os.path.splitext(audio_file)
     for i, start in enumerate(start_times, 1):
         output_filename = SNIPPET_FILE_FORMAT.format(base=filename, i=i)
-        output_path     = os.path.join(OUTPUT_DIR, output_filename)
+        output_path     = os.path.join(output_dir, output_filename)
 
         if os.path.exists(output_path):
             logging.info(f"{output_path} already exists, skipping...")
@@ -34,9 +34,12 @@ def _extract_snippets(audio_file, start_times, duration):
         subprocess.run(cmd, check=True)
 
 
-def generate_snippets(audio_filename, img_filename, snippets_begin):
+def generate_snippets(audio_filename, img_filename, snippets_begin, output_dir=None):
+    target_dir = output_dir or OUTPUT_DIR
+    os.makedirs(target_dir, exist_ok=True)
+
     # audio snippets
-    _extract_snippets(audio_filename, snippets_begin, FRAGMENT_DURATION_S)
+    _extract_snippets(audio_filename, snippets_begin, FRAGMENT_DURATION_S, target_dir)
 
     # album cover snippets (shuffled so each snippet gets a random cover)
     source_img = Image.open(img_filename).convert("RGB")
@@ -46,12 +49,15 @@ def generate_snippets(audio_filename, img_filename, snippets_begin):
 
     filename, ext = os.path.splitext(audio_filename)    
     for i in range(1, len(snippets_begin) + 1):
-        snippet_filepath     = os.path.join(OUTPUT_DIR, SNIPPET_FILE_FORMAT.format(base=filename, i=i))
-        visualization_output = os.path.join(OUTPUT_DIR, VISUALIZATION_FILE_FORMAT.format(base=filename, i=i))
+        snippet_filepath     = os.path.join(target_dir, SNIPPET_FILE_FORMAT.format(base=filename, i=i))
+        visualization_output = os.path.join(target_dir, VISUALIZATION_FILE_FORMAT.format(base=filename, i=i))
 
-        create_visualization(snippet_filepath, img_resized, visualization_output)
+        if os.path.exists(visualization_output):
+            logging.info(f"{visualization_output} already exists, skipping visualization creation...")
+        else:
+            create_visualization(snippet_filepath, img_resized, visualization_output)
 
-        output = os.path.join(OUTPUT_DIR, OUTPUT_FILE_FORMAT.format(base=filename, i=i))
+        output = os.path.join(target_dir, OUTPUT_FILE_FORMAT.format(base=filename, i=i))
 
         logging.info(f"Writing final output to {output}")
         # stich audio and video together
