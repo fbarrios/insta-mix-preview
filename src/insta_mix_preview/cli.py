@@ -2,6 +2,7 @@ import argparse
 import logging
 logging.basicConfig()
 
+from .constants import DEFAULT_LENGTH_S
 from .main import generate_snippets
 
 
@@ -31,6 +32,17 @@ def _parse_timestamp(ts: str) -> float:
     return float(ts)
 
 
+def _positive_int(value: str) -> int:
+    """argparse type for a whole number that is at least 1."""
+    try:
+        parsed = int(value)
+    except ValueError:
+        parsed = 0
+    if parsed < 1:
+        raise argparse.ArgumentTypeError(f"must be a whole number of seconds, at least 1: {value}")
+    return parsed
+
+
 def parse_args():
     parser = argparse.ArgumentParser(
         description="Generate a square Instagram preview by overlaying 10s audio snippets over a background cover."
@@ -52,6 +64,12 @@ def parse_args():
         type=str,
         default='',
         help='Comma-separated list of up to 5 timestamps in seconds or mm:ss for snippet start points'
+    )
+    parser.add_argument(
+        '--length',
+        type=_positive_int,
+        default=DEFAULT_LENGTH_S,
+        help='Length of each snippet in whole seconds (default: %(default)s)'
     )
     parser.add_argument(
         '--output',
@@ -93,5 +111,6 @@ def main():
     logging.debug(f"[DEBUG] Audio path: {audio_path}")
     logging.debug(f"[DEBUG] Output dir: {output_dir or '[default]'}")
     logging.debug(f"[DEBUG] Snippet start times: {snippets}")
+    logging.debug(f"[DEBUG] Snippet length: {args.length}s")
 
-    generate_snippets(audio_path, cover_path, snippets, output_dir)
+    generate_snippets(audio_path, cover_path, snippets, output_dir, args.length)

@@ -1,5 +1,5 @@
 from .visualize import create_visualization
-from .constants import FRAGMENT_DURATION_S, OUTPUT_WIDTH, OUTPUT_HEIGHT
+from .constants import DEFAULT_LENGTH_S, OUTPUT_WIDTH, OUTPUT_HEIGHT
 
 from PIL import Image
 
@@ -34,12 +34,12 @@ def _extract_snippets(audio_file, start_times, duration, output_dir):
         subprocess.run(cmd, check=True)
 
 
-def generate_snippets(audio_filename, img_filename, snippets_begin, output_dir=None):
+def generate_snippets(audio_filename, img_filename, snippets_begin, output_dir=None, length=DEFAULT_LENGTH_S):
     target_dir = output_dir or os.getcwd()
     os.makedirs(target_dir, exist_ok=True)
 
     # audio snippets
-    _extract_snippets(audio_filename, snippets_begin, FRAGMENT_DURATION_S, target_dir)
+    _extract_snippets(audio_filename, snippets_begin, length, target_dir)
 
     # album cover snippets (shuffled so each snippet gets a random cover)
     source_img = Image.open(img_filename).convert("RGB")
@@ -55,7 +55,7 @@ def generate_snippets(audio_filename, img_filename, snippets_begin, output_dir=N
         if os.path.exists(visualization_output):
             logging.info(f"{visualization_output} already exists, skipping visualization creation...")
         else:
-            create_visualization(snippet_filepath, img_resized, visualization_output)
+            create_visualization(snippet_filepath, img_resized, visualization_output, length)
 
         output = os.path.join(target_dir, OUTPUT_FILE_FORMAT.format(base=filename, i=i))
 

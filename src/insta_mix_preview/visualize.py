@@ -12,7 +12,7 @@ os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "true"
 import pygame
 import cv2
 
-from .constants import OUTPUT_WIDTH, OUTPUT_HEIGHT, NUMBER_OF_BARS, BAR_COLOR, FRAGMENT_DURATION_S
+from .constants import OUTPUT_WIDTH, OUTPUT_HEIGHT, NUMBER_OF_BARS, BAR_COLOR
 
 
 FPS = 30
@@ -56,7 +56,7 @@ def background_pil_to_pygame(pil_img):
     return surface
 
 
-def create_visualization(input_filename, background_img, output_filename):
+def create_visualization(input_filename, background_img, output_filename, duration):
     analyzer = AudioAnalyzer()
     analyzer.load(input_filename)
 
@@ -71,7 +71,7 @@ def create_visualization(input_filename, background_img, output_filename):
     writer = cv2.VideoWriter(output_filename, fourcc, FPS, (OUTPUT_WIDTH, OUTPUT_HEIGHT))
 
     frame_count = 0
-    max_frames = int(FRAGMENT_DURATION_S * FPS)
+    max_frames = int(duration * FPS)
 
     running = True
     while running and frame_count < max_frames:

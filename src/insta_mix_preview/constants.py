@@ -1,8 +1,8 @@
 OUTPUT_WIDTH  = 1080
 OUTPUT_HEIGHT = 1080
 
-# how long is each fragment
-FRAGMENT_DURATION_S = 20
+# how long each fragment is by default, in seconds
+DEFAULT_LENGTH_S = 10
 
 # this is the number of bars the visualization will have
 NUMBER_OF_BARS = 50
