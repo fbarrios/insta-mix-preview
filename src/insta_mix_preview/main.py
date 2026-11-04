@@ -1,4 +1,4 @@
-from .visualize import create_visualization
+from .visualize import create_visualization, FPS
 from .constants import DEFAULT_LENGTH_S, OUTPUT_WIDTH, OUTPUT_HEIGHT
 
 from PIL import Image
@@ -61,13 +61,17 @@ def generate_snippets(audio_filename, img_filename, snippets_begin, output_dir=N
 
         logging.info(f"Writing final output to {output}")
         # stich audio and video together
+        # Instagram asks for the moov atom at the front of the file and no edit
+        # lists: https://developers.facebook.com/docs/instagram-platform/instagram-graph-api/reference/ig-user/media
         # should construct a command such as:
         # ffmpeg -y \
-        #     -i 251115_0185-snippet-2.mp4 \
+        #     -i 251115_0185-snippet-2-visualization.mp4 \
+        #     -i 251115_0185-snippet-2.wav \
         #     -c:v libx264 -profile:v high -level 4.1 -pix_fmt yuv420p \
-        #     -movflags +faststart \
-        #     -c:a aac -b:a 192k \
-        #     fixed_251115_0185-snippet-2.mp4
+        #     -bf 0 -g 30 -keyint_min 30 -sc_threshold 0 \
+        #     -c:a aac -b:a 128k \
+        #     -use_editlist 0 -movflags +faststart \
+        #     251115_0185-snippet-2.mp4
         cmd = [
             "ffmpeg",
             "-v", "error",  # only shows erros for a cleaner output
@@ -80,10 +84,17 @@ def generate_snippets(audio_filename, img_filename, snippets_begin, output_dir=N
             "-profile:v", "high",
             "-level", "4.1",
             "-pix_fmt", "yuv420p",
+            "-bf", "0",  # no B-frames, they make the first timestamps negative
+            "-g", str(FPS),  # one keyframe per second
+            "-keyint_min", str(FPS),
+            "-sc_threshold", "0",
             "-c:a", "aac",
-            "-b:a", "192k",
+            "-b:a", "128k",
 
             "-strict", "experimental",
+
+            "-use_editlist", "0",
+            "-movflags", "+faststart",  # moves the moov atom to the front
 
             output
         ]
