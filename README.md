@@ -2,13 +2,13 @@
 
 This script receives as parameters the file paths of the mix cover (1600x1600
 png file), the mix file (only tested with wav), and a list of the timestamps from
-where 20s samples will be extracted.
+where samples will be extracted (10s long by default, see `--length`).
 
 It will generate up to 5 videos playing the samples in the background and a
 visualization of the music with stacked bars. Videos will be in 1080x1080 which is
 Instagram's suggested resolution (source: https://help.instagram.com/1631821640426723).
 
-Output is in the "output" directory unless another path is passed with `--output`.
+Videos are written to the current directory unless another path is passed with `--output`.
 
 Based originally on the project: https://gitlab.com/avirzayev/music-visualizer by
 [Avi Rzayev](https://gitlab.com/avirzayev).
@@ -49,8 +49,11 @@ insta-mix-preview --cover="coffee.png" --audio="coffee.wav" --snippets_start=2,1
 ## Usage:
 
 ```bash
-uv run insta-mix-preview --cover="path/to/cover.png" --audio="path/to/mix.wav" --snippets_start=20,90,210 [--output="path/to/dir"] [--debug] [--help]
+uv run insta-mix-preview --cover="path/to/cover.png" --audio="path/to/mix.wav" --snippets_start=20,90,210 [--length=10] [--output="path/to/dir"] [--debug] [--help]
 ```
+
+Paths can be relative, absolute, or Windows-style (`C:/...` or `C:\...`, which
+are converted to `/mnt/c/...` for WSL).
 
 Options:
 
@@ -60,7 +63,9 @@ Options:
 
 - `--snippets_start=...`: up to 5 comma-separated values of the timestamps where the snippets will start, in seconds or `mm:ss`
 
-- `--output="dir path"`: where to write the videos (default: the `output` directory)
+- `--length=seconds`: length of each snippet, in whole seconds (default: 10)
+
+- `--output="dir path"`: where to write the videos, created if missing (default: the current directory)
 
 - `--debug`: print some extra debug information
 

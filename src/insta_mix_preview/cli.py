@@ -45,7 +45,7 @@ def _positive_int(value: str) -> int:
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="Generate a square Instagram preview by overlaying 10s audio snippets over a background cover."
+        description="Generate square Instagram previews by overlaying audio snippets and a visualization on a cover image. Paths can be relative, absolute, or Windows-style (C:/...)."
     )
     parser.add_argument(
         '--cover',
@@ -75,7 +75,7 @@ def parse_args():
         '--output',
         type=str,
         default='',
-        help='Output directory (defaults to the built-in output folder)'
+        help='Output directory, created if missing (default: the current directory)'
     )
     parser.add_argument(
         '--debug',
