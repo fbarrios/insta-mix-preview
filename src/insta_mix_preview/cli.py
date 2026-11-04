@@ -2,7 +2,7 @@ import argparse
 import logging
 logging.basicConfig()
 
-from main import generate_snippets
+from .main import generate_snippets
 
 
 def _to_wsl_path(path: str) -> str:
@@ -95,6 +95,3 @@ def main():
     logging.debug(f"[DEBUG] Snippet start times: {snippets}")
 
     generate_snippets(audio_path, cover_path, snippets, output_dir)
-
-if __name__ == '__main__':
-    main()

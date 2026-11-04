@@ -1,6 +1,6 @@
 # This module handles the creation of the visualization.
 
-from AudioAnalyzer import AudioAnalyzer
+from .AudioAnalyzer import AudioAnalyzer
 
 import numpy as np
 
@@ -12,7 +12,7 @@ os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "true"
 import pygame
 import cv2
 
-from constants import OUTPUT_WIDTH, OUTPUT_HEIGHT, NUMBER_OF_BARS, BAR_COLOR, FRAGMENT_DURATION_S
+from .constants import OUTPUT_WIDTH, OUTPUT_HEIGHT, NUMBER_OF_BARS, BAR_COLOR, FRAGMENT_DURATION_S
 
 
 FPS = 30

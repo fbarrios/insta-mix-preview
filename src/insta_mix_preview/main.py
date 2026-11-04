@@ -1,5 +1,5 @@
-from visualize import create_visualization
-from constants import FRAGMENT_DURATION_S, OUTPUT_WIDTH, OUTPUT_HEIGHT, OUTPUT_DIR
+from .visualize import create_visualization
+from .constants import FRAGMENT_DURATION_S, OUTPUT_WIDTH, OUTPUT_HEIGHT, OUTPUT_DIR
 
 from PIL import Image
 
