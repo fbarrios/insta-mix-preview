@@ -3,6 +3,8 @@ OUTPUT_HEIGHT = 1080
 
 # how long each fragment is by default, in seconds
 DEFAULT_LENGTH_S = 10
+# the shortest video Instagram accepts, in seconds
+MIN_LENGTH_S = 3
 
 # this is the number of bars the visualization will have
 NUMBER_OF_BARS = 50

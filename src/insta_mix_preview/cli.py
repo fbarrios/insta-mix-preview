@@ -2,7 +2,7 @@ import argparse
 import logging
 logging.basicConfig()
 
-from .constants import DEFAULT_LENGTH_S
+from .constants import DEFAULT_LENGTH_S, MIN_LENGTH_S
 from .main import generate_snippets
 
 
@@ -32,14 +32,14 @@ def _parse_timestamp(ts: str) -> float:
     return float(ts)
 
 
-def _positive_int(value: str) -> int:
-    """argparse type for a whole number that is at least 1."""
+def _snippet_length(value: str) -> int:
+    """argparse type for a snippet length in whole seconds."""
     try:
         parsed = int(value)
     except ValueError:
         parsed = 0
-    if parsed < 1:
-        raise argparse.ArgumentTypeError(f"must be a whole number of seconds, at least 1: {value}")
+    if parsed < MIN_LENGTH_S:
+        raise argparse.ArgumentTypeError(f"must be a whole number of seconds, at least {MIN_LENGTH_S}: {value}")
     return parsed
 
 
@@ -67,9 +67,9 @@ def parse_args():
     )
     parser.add_argument(
         '--length',
-        type=_positive_int,
+        type=_snippet_length,
         default=DEFAULT_LENGTH_S,
-        help='Length of each snippet in whole seconds (default: %(default)s)'
+        help=f'Length of each snippet in whole seconds, at least {MIN_LENGTH_S} (default: %(default)s)'
     )
     parser.add_argument(
         '--output',

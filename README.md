@@ -63,7 +63,7 @@ Options:
 
 - `--snippets_start=...`: up to 5 comma-separated values of the timestamps where the snippets will start, in seconds or `mm:ss`
 
-- `--length=seconds`: length of each snippet, in whole seconds (default: 10)
+- `--length=seconds`: length of each snippet, in whole seconds, at least 3 (default: 10)
 
 - `--output="dir path"`: where to write the videos, created if missing (default: the current directory)
 
