@@ -1,5 +1,3 @@
-OUTPUT_DIR = "output"  # this will be used, unless another path is passed with --output
-
 OUTPUT_WIDTH  = 1080
 OUTPUT_HEIGHT = 1080
 

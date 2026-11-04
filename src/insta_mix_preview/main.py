@@ -1,5 +1,5 @@
 from .visualize import create_visualization
-from .constants import FRAGMENT_DURATION_S, OUTPUT_WIDTH, OUTPUT_HEIGHT, OUTPUT_DIR
+from .constants import FRAGMENT_DURATION_S, OUTPUT_WIDTH, OUTPUT_HEIGHT
 
 from PIL import Image
 
@@ -13,7 +13,7 @@ OUTPUT_FILE_FORMAT        = "{base}-snippet-{i}.mp4"
 
 
 def _extract_snippets(audio_file, start_times, duration, output_dir):
-    filename, ext = os.path.splitext(audio_file)
+    filename, ext = os.path.splitext(os.path.basename(audio_file))
     for i, start in enumerate(start_times, 1):
         output_filename = SNIPPET_FILE_FORMAT.format(base=filename, i=i)
         output_path     = os.path.join(output_dir, output_filename)
@@ -35,7 +35,7 @@ def _extract_snippets(audio_file, start_times, duration, output_dir):
 
 
 def generate_snippets(audio_filename, img_filename, snippets_begin, output_dir=None):
-    target_dir = output_dir or OUTPUT_DIR
+    target_dir = output_dir or os.getcwd()
     os.makedirs(target_dir, exist_ok=True)
 
     # audio snippets
@@ -47,7 +47,7 @@ def generate_snippets(audio_filename, img_filename, snippets_begin, output_dir=N
     # resize the image to expected resolution
     img_resized = source_img.resize((OUTPUT_WIDTH, OUTPUT_HEIGHT), resample=Image.LANCZOS)
 
-    filename, ext = os.path.splitext(audio_filename)    
+    filename, ext = os.path.splitext(os.path.basename(audio_filename))
     for i in range(1, len(snippets_begin) + 1):
         snippet_filepath     = os.path.join(target_dir, SNIPPET_FILE_FORMAT.format(base=filename, i=i))
         visualization_output = os.path.join(target_dir, VISUALIZATION_FILE_FORMAT.format(base=filename, i=i))
