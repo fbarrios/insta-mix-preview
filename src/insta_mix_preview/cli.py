@@ -19,7 +19,7 @@ def _to_wsl_path(path: str) -> str:
 
 
 def _parse_timestamp(ts: str) -> float:
-    """Allow timestamps in seconds or mm:ss."""
+    """Allow timestamps in seconds, mm:ss or hh:mm:ss."""
     ts = ts.strip()
     if not ts:
         raise ValueError("empty timestamp")
@@ -28,6 +28,9 @@ def _parse_timestamp(ts: str) -> float:
         if len(parts) == 2:
             minutes, seconds = parts
             return float(minutes) * 60 + float(seconds)
+        if len(parts) == 3:
+            hours, minutes, seconds = parts
+            return float(hours) * 3600 + float(minutes) * 60 + float(seconds)
         raise ValueError(f"unsupported timestamp format: {ts}")
     return float(ts)
 
@@ -63,7 +66,7 @@ def parse_args():
         '--snippets_start',
         type=str,
         default='',
-        help='Comma-separated list of up to 5 timestamps in seconds or mm:ss for snippet start points'
+        help='Comma-separated list of up to 5 timestamps in seconds, mm:ss or hh:mm:ss for snippet start points'
     )
     parser.add_argument(
         '--length',

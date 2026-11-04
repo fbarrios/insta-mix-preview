@@ -61,7 +61,7 @@ Options:
 
 - `--audio="file path"`: the audio file to be processed (preferred: WAV)
 
-- `--snippets_start=...`: up to 5 comma-separated values of the timestamps where the snippets will start, in seconds or `mm:ss`
+- `--snippets_start=...`: up to 5 comma-separated values of the timestamps where the snippets will start, in seconds, `mm:ss` or `hh:mm:ss`
 
 - `--length=seconds`: length of each snippet, in whole seconds, at least 3 (default: 10)
 
